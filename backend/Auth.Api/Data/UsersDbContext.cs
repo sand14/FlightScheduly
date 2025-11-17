@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Data;
@@ -7,6 +7,15 @@ public class UsersDbContext(DbContextOptions<UsersDbContext> options) : Identity
 {
     public DbSet<UserRole> UserRoles { get; set; }
     
+    /// <summary>
+    /// Configures the EF Core model for identity-related entities and seeds initial role data.
+    /// </summary>
+    /// <remarks>
+    /// Configures the join entity for user-role mapping with a composite primary key and required foreign keys,
+    /// enforces length and required constraints for ApplicationUser first and last names, adds a unique index on Email,
+    /// seeds predefined ApplicationRole entries, and sets the default schema to "identity".
+    /// </remarks>
+    /// <param name="builder">The ModelBuilder used to configure entity mappings and seed data.</param>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

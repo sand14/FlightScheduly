@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +19,9 @@ public class AuthService : IAuthService
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly JwtSettings _jwtSettings;
 
+    /// <summary>
+    /// Initializes a new instance of AuthService with the required ASP.NET Identity managers and JWT settings.
+    /// </summary>
     public AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
@@ -31,6 +34,12 @@ public class AuthService : IAuthService
         _jwtSettings = jwtSettings.Value;
     }
 
+    /// <summary>
+    /// Creates a new user account from the provided registration details and assigns the "Student" role if that role exists.
+    /// </summary>
+    /// <param name="request">Registration data containing email, password, first name, and last name.</param>
+    /// <returns>A <see cref="UserResponse"/> representing the newly created user.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when user creation fails; the exception message contains concatenated identity error descriptions.</exception>
     public async Task<UserResponse> RegisterAsync(RegisterRequest request)
     {
         var user = new ApplicationUser
@@ -57,6 +66,15 @@ public class AuthService : IAuthService
         return await MapToUserResponse(user);
     }
 
+    /// <summary>
+    /// Authenticates a user with email and password and returns JWT and refresh token information.
+    /// </summary>
+    /// <param name="request">Login credentials containing the user's email and password.</param>
+    /// <returns>A <see cref="LoginResponse"/> containing the JWT, refresh token, token expiration, and the authenticated user's public data.</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when credentials are invalid or the account is locked.</exception>
+    /// <remarks>
+    /// On successful authentication this method updates the user's LastLoginAt timestamp and stores the generated refresh token on the user record.
+    /// </remarks>
     public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
@@ -90,6 +108,12 @@ public class AuthService : IAuthService
         return new LoginResponse(token, refreshToken, expiresAt, userResponse);
     }
 
+    /// <summary>
+    /// Refreshes authentication credentials by validating an expired JWT and the provided refresh token, then issues a new JWT and refresh token.
+    /// </summary>
+    /// <param name="request">Request containing the expired JWT in <c>Token</c> and the associated refresh token in <c>RefreshToken</c>.</param>
+    /// <returns>A <see cref="LoginResponse"/> containing the new JWT, the new refresh token, its UTC expiration time, and the user's public data.</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when the expired token is invalid or the refresh token does not match the user's stored refresh token.</exception>
     public async Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request)
     {
         var principal = GetPrincipalFromExpiredToken(request.Token);
@@ -118,6 +142,11 @@ public class AuthService : IAuthService
         return new LoginResponse(newToken, newRefreshToken, expiresAt, userResponse);
     }
 
+    /// <summary>
+    /// Revokes any existing refresh tokens for the specified user by resetting their security stamp and persisting the change.
+    /// </summary>
+    /// <param name="userId">The identifier of the user whose tokens should be revoked.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if no user with the specified id exists.</exception>
     public async Task RevokeTokenAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -130,6 +159,12 @@ public class AuthService : IAuthService
         await _userManager.UpdateAsync(user);
     }
 
+    /// <summary>
+    /// Retrieves a user's public information by their identifier.
+    /// </summary>
+    /// <param name="userId">The identifier of the user to retrieve.</param>
+    /// <returns>A <see cref="UserResponse"/> representing the user.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if no user exists with the specified id.</exception>
     public async Task<UserResponse> GetUserByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -141,6 +176,14 @@ public class AuthService : IAuthService
         return await MapToUserResponse(user);
     }
 
+    /// <summary>
+    /// Updates a user's first and/or last name and returns the updated user representation.
+    /// </summary>
+    /// <param name="userId">The identifier of the user to update.</param>
+    /// <param name="request">The update payload; non-empty <c>FirstName</c> and <c>LastName</c> values will be applied.</param>
+    /// <returns>The updated user mapped to a <see cref="UserResponse"/>.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when no user exists with the specified <paramref name="userId"/>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the user update operation fails; the exception message contains the identity error descriptions.</exception>
     public async Task<UserResponse> UpdateUserAsync(string userId, UpdateUserRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -161,6 +204,13 @@ public class AuthService : IAuthService
         return await MapToUserResponse(user);
     }
 
+    /// <summary>
+    /// Changes the password for the user identified by <paramref name="userId"/> using the provided current and new passwords.
+    /// </summary>
+    /// <param name="userId">The identifier of the user whose password will be changed.</param>
+    /// <param name="request">Contains the current password and the new password to set.</param>
+    /// <exception cref="KeyNotFoundException">Thrown when no user exists with the specified <paramref name="userId"/>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the password change fails; the exception message contains concatenated identity error descriptions.</exception>
     public async Task ChangePasswordAsync(string userId, ChangePasswordRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -176,6 +226,13 @@ public class AuthService : IAuthService
         }
     }
 
+    /// <summary>
+    /// Assigns the specified role to the user identified in the request.
+    /// </summary>
+    /// <param name="request">Contains the target user's ID and the role name to assign.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if no user exists with the provided ID.</exception>
+    /// <exception cref="ArgumentException">Thrown if the specified role does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the role assignment fails; the exception message contains identity error descriptions.</exception>
     public async Task AssignRoleAsync(AssignRoleRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
@@ -196,6 +253,11 @@ public class AuthService : IAuthService
         }
     }
 
+    /// <summary>
+    /// Builds a JSON Web Token that encodes the specified user's identity and roles.
+    /// </summary>
+    /// <param name="user">The user whose identity and roles will be embedded as claims in the token.</param>
+    /// <returns>The serialized JWT string containing the user's id, email, name, user type, and role claims, signed with the configured key and set to expire per configuration.</returns>
     private async Task<string> GenerateJwtToken(ApplicationUser user)
     {
         var roles = await _userManager.GetRolesAsync(user);
@@ -225,6 +287,10 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    /// <summary>
+    /// Creates a cryptographically secure random token and encodes it as Base64.
+    /// </summary>
+    /// <returns>A Base64-encoded string containing 32 cryptographically secure random bytes suitable for use as a refresh token.</returns>
     private static string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
@@ -233,6 +299,13 @@ public class AuthService : IAuthService
         return Convert.ToBase64String(randomNumber);
     }
 
+    /// <summary>
+    /// Extracts the claims principal from a JWT even if the token has expired.
+    /// </summary>
+    /// <param name="token">The JWT string to validate and read (may be expired).</param>
+    /// <returns>
+    /// A <see cref="ClaimsPrincipal"/> containing the token's claims if the token is valid and signed with the service's signing key using HmacSha256; otherwise <c>null</c>.
+    /// </returns>
     private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
@@ -263,6 +336,11 @@ public class AuthService : IAuthService
         }
     }
 
+    /// <summary>
+    /// Maps an ApplicationUser to a UserResponse DTO including the user's roles and active status.
+    /// </summary>
+    /// <param name="user">The application user to map.</param>
+    /// <returns>A UserResponse containing the user's id, email, first name, last name, user type, roles, and active flag.</returns>
     private async Task<UserResponse> MapToUserResponse(ApplicationUser user)
     {
         var roles = await _userManager.GetRolesAsync(user);

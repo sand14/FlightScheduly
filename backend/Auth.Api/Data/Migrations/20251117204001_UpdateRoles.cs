@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -10,7 +10,10 @@ namespace Auth.Api.Data.Migrations
     /// <inheritdoc />
     public partial class UpdateRoles : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Applies schema changes to the identity schema: removes legacy user columns, adds user and role columns, creates the identity.UserRoles join table with its constraints, seeds predefined roles, and creates the new indexes.
+        /// </summary>
+        /// <param name="migrationBuilder">The builder used to define the migration operations against the database schema.</param>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -155,7 +158,10 @@ namespace Auth.Api.Data.Migrations
                 column: "RoleId");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Reverts the UpdateRoles migration by removing added identity schema changes and restoring the previous user columns and defaults.
+        /// </summary>
+        /// <param name="migrationBuilder">The builder used to define operations that revert the migration.</param>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
