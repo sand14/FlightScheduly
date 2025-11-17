@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -9,7 +9,9 @@ namespace Auth.Api.Data.Migrations
     /// <inheritdoc />
     public partial class Initial : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Applies the initial Identity schema by ensuring the "identity" schema exists and creating the AspNetRoles, AspNetUsers, AspNetRoleClaims, AspNetUserClaims, AspNetUserLogins, AspNetUserRoles, and AspNetUserTokens tables along with their primary keys, foreign keys, defaults, and indexes.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
