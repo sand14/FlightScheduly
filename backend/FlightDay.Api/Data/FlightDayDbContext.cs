@@ -27,6 +27,7 @@ public class FlightDayDbContext : DbContext
             entity.Property(f => f.Description).HasMaxLength(1000);
             entity.Property(f => f.Date).IsRequired();
             entity.Property(f => f.Status).IsRequired();
+            entity.Property(f => f.CreatedAt).HasDefaultValueSql("now() at time zone 'utc'");
             
             entity.HasIndex(f => new { f.Date, f.InstructorId });
             entity.HasIndex(f => f.Status);
@@ -49,6 +50,7 @@ public class FlightDayDbContext : DbContext
             entity.Property(a => a.UserId).IsRequired().HasMaxLength(450);
             entity.Property(a => a.UserEmail).IsRequired().HasMaxLength(256);
             entity.Property(a => a.UserName).IsRequired().HasMaxLength(256);
+            entity.Property(a => a.AuthorizedAt).HasDefaultValueSql("now() at time zone 'utc'");
             
             entity.HasIndex(a => new { a.FlightDayId, a.UserId }).IsUnique();
         });

@@ -13,7 +13,7 @@ public class FlightDay
     public string Location { get; set; } = string.Empty;
     public string? Description { get; set; }
     public FlightDayStatus Status { get; set; } = FlightDayStatus.Active;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     
     // Navigation properties
