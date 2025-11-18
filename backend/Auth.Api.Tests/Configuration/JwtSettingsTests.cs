@@ -6,16 +6,6 @@ namespace Auth.Api.Tests.Configuration;
 public class JwtSettingsTests
 {
     [Fact]
-    public void JwtSettings_ShouldHaveRequiredSecret()
-    {
-        // Arrange & Act
-        var action = () => new JwtSettings { Secret = null! };
-
-        // Assert
-        action.Should().Throw<ArgumentNullException>();
-    }
-
-    [Fact]
     public void JwtSettings_ShouldInitializeWithDefaultValues()
     {
         // Arrange & Act

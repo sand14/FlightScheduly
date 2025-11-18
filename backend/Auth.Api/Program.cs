@@ -23,8 +23,6 @@ if (string.IsNullOrWhiteSpace(jwtSettings.Secret))
 builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("usersdb")));
 
-builder.EnrichNpgsqlDbContext<UsersDbContext>();
-
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     {
         // Password settings

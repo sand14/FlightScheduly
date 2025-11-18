@@ -1,11 +1,10 @@
 using Auth.Api.Configuration;
 using Auth.Api.Constants;
 using Auth.Api.Data;
+using Auth.Api.Models;
 using Auth.Api.Services;
-using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Moq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -60,7 +59,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -82,7 +81,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -104,7 +103,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -126,7 +125,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
         var roles = new List<string> { Roles.Student, Roles.Pilot };
 
         _userManagerMock.Setup(x => x.FindByEmailAsync(request.Email))
@@ -159,7 +158,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -179,7 +178,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -199,7 +198,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -220,7 +219,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -236,7 +235,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -252,7 +251,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -269,7 +268,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 
@@ -291,7 +290,7 @@ public class JwtTokenTests
     {
         // Arrange
         var user = CreateTestUser();
-        var request = new Models.LoginRequest(user.Email!, "Password123!");
+        var request = new LoginRequest(user.Email!, "Password123!");
 
         SetupSuccessfulLogin(user);
 

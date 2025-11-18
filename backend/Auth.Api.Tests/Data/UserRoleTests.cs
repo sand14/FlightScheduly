@@ -9,7 +9,11 @@ public class UserRoleTests
     public void UserRole_ShouldInitializeWithDefaultValues()
     {
         // Act
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = null!,
+            RoleId = null!,
+        };
 
         // Assert
         userRole.UserId.Should().BeNull();
@@ -23,7 +27,11 @@ public class UserRoleTests
     public void UserRole_ShouldAllowSettingUserId()
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = "user-id",
+            RoleId = "role-id",
+        };
 
         // Act
         userRole.UserId = "test-user-id";
@@ -36,7 +44,11 @@ public class UserRoleTests
     public void UserRole_ShouldAllowSettingRoleId()
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = "user-id",
+            RoleId = "role-id",
+        };
 
         // Act
         userRole.RoleId = "test-role-id";
@@ -49,7 +61,11 @@ public class UserRoleTests
     public void UserRole_ShouldAllowSettingAssignedAt()
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = "user-id",
+            RoleId = "role-id",
+        };
         var now = DateTime.UtcNow;
 
         // Act
@@ -63,7 +79,11 @@ public class UserRoleTests
     public void UserRole_ShouldAllowSettingUser()
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = "user-id",
+            RoleId = "role-id",
+        };
         var user = new ApplicationUser { Id = "user-id" };
 
         // Act
@@ -77,7 +97,11 @@ public class UserRoleTests
     public void UserRole_ShouldAllowSettingRole()
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole
+        {
+            UserId = "user-id",
+            RoleId = "role-id",
+        };
         var role = new ApplicationRole { Id = "role-id" };
 
         // Act
@@ -168,10 +192,11 @@ public class UserRoleTests
     public void UserRole_ShouldAcceptVariousUserIdFormats(string userId)
     {
         // Arrange
-        var userRole = new UserRole();
-
-        // Act
-        userRole.UserId = userId;
+        var userRole = new UserRole() 
+        { 
+            RoleId = "role-id",
+            UserId = userId,
+        };
 
         // Assert
         userRole.UserId.Should().Be(userId);
@@ -184,7 +209,11 @@ public class UserRoleTests
     public void UserRole_ShouldAcceptVariousRoleIdFormats(string roleId)
     {
         // Arrange
-        var userRole = new UserRole();
+        var userRole = new UserRole()
+        {
+            RoleId = roleId,
+            UserId = "userId",
+        };
 
         // Act
         userRole.RoleId = roleId;
@@ -198,7 +227,11 @@ public class UserRoleTests
     {
         // Arrange
         var preciseTime = new DateTime(2024, 1, 15, 10, 30, 45, 123, DateTimeKind.Utc);
-        var userRole = new UserRole();
+        var userRole = new UserRole()
+        {
+            RoleId = "role-id",
+            UserId = "user-id",
+        };
 
         // Act
         userRole.AssignedAt = preciseTime;
