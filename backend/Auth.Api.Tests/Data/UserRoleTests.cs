@@ -11,13 +11,13 @@ public class UserRoleTests
         // Act
         var userRole = new UserRole
         {
-            UserId = null!,
-            RoleId = null!,
+            UserId = string.Empty,
+            RoleId = string.Empty,
         };
 
         // Assert
-        userRole.UserId.Should().BeNull();
-        userRole.RoleId.Should().BeNull();
+        userRole.UserId.Should().Be(string.Empty);
+        userRole.RoleId.Should().Be(string.Empty);
         userRole.AssignedAt.Should().Be(default(DateTime));
         userRole.User.Should().BeNull();
         userRole.Role.Should().BeNull();
