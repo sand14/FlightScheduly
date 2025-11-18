@@ -42,7 +42,7 @@ namespace Auth.Api.Data.Migrations
                     FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     UserType = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() at time zone 'utc'"),
                     LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LicenseExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RadioLicenseExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
