@@ -29,7 +29,7 @@ public class FlightDayDbContext : DbContext
             entity.Property(f => f.Status).IsRequired();
             entity.Property(f => f.CreatedAt).HasDefaultValueSql("now() at time zone 'utc'");
             
-            entity.HasIndex(f => new { f.Date, f.InstructorId });
+            entity.HasIndex(f => new { f.Date, f.InstructorId }).IsUnique();
             entity.HasIndex(f => f.Status);
             
             entity.HasMany(f => f.AuthorizedUsers)
