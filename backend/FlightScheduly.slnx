@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Auth.Api\Auth.Api.csproj" />
+  <Project Path="Auth.Api.Tests\Auth.Api.Tests.csproj" />
+  <Project Path="FlightScheduly.AppHost\FlightScheduly.AppHost.csproj" />
+  <Project Path="FlightScheduly.ServiceDefaults\FlightScheduly.ServiceDefaults.csproj" />
+</Solution>
