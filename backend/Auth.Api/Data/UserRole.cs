@@ -8,5 +8,5 @@ public class UserRole
     public required string RoleId { get; set; }
     public ApplicationRole Role { get; set; } = null!;
     
-    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public DateTime AssignedAt { get; set; }
 }

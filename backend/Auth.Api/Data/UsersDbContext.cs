@@ -5,7 +5,7 @@ namespace Auth.Api.Data;
 
 public class UsersDbContext(DbContextOptions<UsersDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
 {
-    public DbSet<UserRole> UserRoles { get; set; }
+    public new DbSet<UserRole> UserRoles { get; set; }
     
     /// <summary>
     /// Configures the EF Core model for identity-related entities and seeds initial role data.
@@ -42,6 +42,7 @@ public class UsersDbContext(DbContextOptions<UsersDbContext> options) : Identity
             entity.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
             entity.Property(u => u.LastName).HasMaxLength(100).IsRequired();
             entity.HasIndex(u => u.Email).IsUnique();
+            entity.Property(u => u.CreatedAt).HasDefaultValueSql("now() at time zone 'utc'");
         });
 
         // Seed default roles with static Guids (V7 format for time-ordering)

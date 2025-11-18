@@ -311,8 +311,10 @@ public class AuthService : IAuthService
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidAudience = _jwtSettings.Audience,
+            ValidIssuer = _jwtSettings.Issuer,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
             ValidateLifetime = false

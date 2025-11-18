@@ -31,7 +31,7 @@ Task RevokeTokenAsync(string userId);
 /// Retrieves information for the user with the specified identifier.
 /// </summary>
 /// <param name="userId">The unique identifier of the user to retrieve.</param>
-/// <returns>The user's details, or null if no user exists with the given identifier.</returns>
+/// <returns>The user's details.</returns>
 Task<UserResponse> GetUserByIdAsync(string userId);
     /// <summary>
 /// Updates the specified user's profile with the provided update data.
@@ -47,8 +47,8 @@ Task<UserResponse> UpdateUserAsync(string userId, UpdateUserRequest request);
 /// <param name="request">Contains the current password and the new password to apply.</param>
 Task ChangePasswordAsync(string userId, ChangePasswordRequest request);
     /// <summary>
-/// Assigns one or more roles to a user according to the provided role assignment data.
+/// Assigns one roles to a user according to the provided role assignment data.
 /// </summary>
-/// <param name="request">Role assignment details including the target user ID and the roles to assign.</param>
+/// <param name="request">Role assignment details including the target user ID and the role ID to assign.</param>
 Task AssignRoleAsync(AssignRoleRequest request);
 }

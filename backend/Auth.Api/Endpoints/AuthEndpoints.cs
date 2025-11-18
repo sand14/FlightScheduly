@@ -1,8 +1,9 @@
-using System.Security.Claims;
 using Auth.Api.Constants;
 using Auth.Api.Models;
 using Auth.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using OpenTelemetry.Trace;
+using System.Security.Claims;
 
 namespace Auth.Api.Endpoints;
 
@@ -38,7 +39,8 @@ public static class AuthEndpoints
             .WithName("Logout")
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound); ;
 
         group.MapGet("/me", GetCurrentUserAsync)
             .WithName("GetCurrentUser")
@@ -52,14 +54,16 @@ public static class AuthEndpoints
             .RequireAuthorization()
             .Produces<UserResponse>(StatusCodes.Status200OK)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         group.MapPost("/change-password", ChangePasswordAsync)
             .WithName("ChangePassword")
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         // Admin-only endpoints
         group.MapPost("/assign-role", AssignRoleAsync)
@@ -68,7 +72,8 @@ public static class AuthEndpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status403Forbidden);
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound);
 
         group.MapGet("/user/{userId}", GetUserByIdAsync)
             .WithName("GetUserById")
@@ -101,20 +106,20 @@ public static class AuthEndpoints
         }
         catch (ArgumentException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Invalid request", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Invalid request",
+                Detail = ex.Message
             });
         }
         catch (InvalidOperationException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Registration failed", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Registration failed",
+                Detail = ex.Message
             });
         }
     }
@@ -254,11 +259,11 @@ public static class AuthEndpoints
         }
         catch (InvalidOperationException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Update failed", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Update failed",
+                Detail = ex.Message
             });
         }
     }
@@ -282,7 +287,18 @@ public static class AuthEndpoints
         try
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Results.Problem(
+                                 statusCode: StatusCodes.Status401Unauthorized,
+                                 title: "Unauthorized",
+                                 detail: "User identifier is missing from the authentication token.");
+            }
+
+            await authService.RevokeTokenAsync(userId);
+
             await authService.ChangePasswordAsync(userId, request);
+
             return Results.NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -295,11 +311,11 @@ public static class AuthEndpoints
         }
         catch (InvalidOperationException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Password change failed", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Password change failed",
+                Detail = ex.Message
             });
         }
     }
@@ -328,20 +344,20 @@ public static class AuthEndpoints
         }
         catch (ArgumentException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Invalid role", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Invalid role",
+                Detail = ex.Message
             });
         }
         catch (InvalidOperationException ex)
         {
-            return Results.BadRequest(new ProblemDetails 
-            { 
-                Status = 400, 
-                Title = "Role assignment failed", 
-                Detail = ex.Message 
+            return Results.BadRequest(new ProblemDetails
+            {
+                Status = 400,
+                Title = "Role assignment failed",
+                Detail = ex.Message
             });
         }
     }

@@ -4,7 +4,6 @@ using Auth.Api.Constants;
 using Auth.Api.Data;
 using Auth.Api.Endpoints;
 using Auth.Api.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+var jwtSection = builder.Configuration.GetSection("JwtSettings");
+var jwtSettings = jwtSection.Get<JwtSettings>()
+    ?? throw new InvalidOperationException("JwtSettings configuration section is missing or invalid.");
+if (string.IsNullOrWhiteSpace(jwtSettings.Secret))
+    throw new InvalidOperationException("JwtSettings.Secret must be configured.");
 
 builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("usersdb")));
@@ -52,7 +55,7 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         options.SaveToken = true;
-        options.RequireHttpsMetadata = false; // Set to true in production
+        options.RequireHttpsMetadata = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
