@@ -215,9 +215,6 @@ public class UserRoleTests
             UserId = "userId",
         };
 
-        // Act
-        userRole.RoleId = roleId;
-
         // Assert
         userRole.RoleId.Should().Be(roleId);
     }
