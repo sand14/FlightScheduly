@@ -47,7 +47,8 @@ public class AuthService : IAuthService
             UserName = request.Email,
             Email = request.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            UserType = UserType.Student,
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

@@ -2,10 +2,10 @@
 
 public class UserRole
 {
-    public string UserId { get; set; } = string.Empty;
+    public required string UserId { get; set; } 
     public ApplicationUser User { get; set; } = null!;
     
-    public string RoleId { get; set; } = string.Empty;
+    public required string RoleId { get; set; }
     public ApplicationRole Role { get; set; } = null!;
     
     public DateTime AssignedAt { get; set; } = DateTime.UtcNow;

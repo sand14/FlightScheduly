@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Auth.Api.Data.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
     {
-        /// <summary>
-        /// Applies the initial Identity schema by ensuring the "identity" schema exists and creating the AspNetRoles, AspNetUsers, AspNetRoleClaims, AspNetUserClaims, AspNetUserLogins, AspNetUserRoles, and AspNetUserTokens tables along with their primary keys, foreign keys, defaults, and indexes.
-        /// </summary>
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
@@ -23,6 +23,7 @@ namespace Auth.Api.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -38,8 +39,15 @@ namespace Auth.Api.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    Discriminator = table.Column<string>(type: "character varying(13)", maxLength: 13, nullable: false),
-                    EnableNotifications = table.Column<bool>(type: "boolean", nullable: true, defaultValue: true),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    UserType = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LicenseExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RadioLicenseExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    MedicalLicenseExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -177,6 +185,46 @@ namespace Auth.Api.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                schema: "identity",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() at time zone 'utc'")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_UserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "identity",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "identity",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                schema: "identity",
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "018e8c5d-4f6a-7000-8000-000000000001", "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d", "Full system access", "Administrator", "ADMINISTRATOR" },
+                    { "018e8c5d-4f6a-7000-8000-000000000002", "b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e", "Can create flight days and manage bookings", "Instructor", "INSTRUCTOR" },
+                    { "018e8c5d-4f6a-7000-8000-000000000003", "c3d4e5f6-a7b8-4c5d-0e1f-2a3b4c5d6e7f", "Can book flight slots", "Student", "STUDENT" },
+                    { "018e8c5d-4f6a-7000-8000-000000000004", "d4e5f6a7-b8c9-4d5e-1f2a-3b4c5d6e7f8a", "Can book flight slots", "Pilot", "PILOT" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 schema: "identity",
@@ -215,11 +263,24 @@ namespace Auth.Api.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                schema: "identity",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "identity",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleId",
+                schema: "identity",
+                table: "UserRoles",
+                column: "RoleId");
         }
 
         /// <inheritdoc />
@@ -243,6 +304,10 @@ namespace Auth.Api.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens",
+                schema: "identity");
+
+            migrationBuilder.DropTable(
+                name: "UserRoles",
                 schema: "identity");
 
             migrationBuilder.DropTable(

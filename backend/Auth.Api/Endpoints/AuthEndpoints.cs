@@ -174,6 +174,7 @@ public static class AuthEndpoints
     /// Revokes the authenticated user's refresh token to log them out.
     /// </summary>
     /// <param name="user">The authenticated principal whose identifier is used to determine which user's tokens to revoke.</param>
+    /// <param name="authService">Authentication Service that does the work.</param>
     /// <returns>`204 NoContent` on success; a `404` ProblemDetails response if the user is not found.</returns>
     private static async Task<IResult> LogoutAsync(
         ClaimsPrincipal user,

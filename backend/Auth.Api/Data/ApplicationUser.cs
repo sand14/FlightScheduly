@@ -7,7 +7,7 @@ public class ApplicationUser : IdentityUser
    public string FirstName { get; set; } = string.Empty;
    public string LastName { get; set; } = string.Empty;
    public UserType UserType { get; set; }
-   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+   public DateTime CreatedAt { get; set; }
    public DateTime? LastLoginAt { get; set; }
    public DateTime? LicenseExpirationDate { get; set; }
    public DateTime? RadioLicenseExpirationDate { get; set; }
